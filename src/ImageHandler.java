@@ -306,8 +306,8 @@ public class ImageHandler {
 		double minItr = itrArray[0][0];
 		double maxItr = itrArray[0][0];
 		
-		double peakPointRed = 0.6;
-		double peakPointGreen = 0.4;
+		double peakPointRed = 0.9;
+		double peakPointGreen = 0.9;
 		
 		
 		// Lets check what is the minimum and maximum iteration in the calculated array
@@ -318,7 +318,7 @@ public class ImageHandler {
 			}
 		}
 		
-		double minGreen = minItr + (maxItr-minItr)*0.35;
+		double minGreen = minItr + (maxItr-minItr)*0.0;
 		
 		BufferedImage img = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_RGB);
 		int r = 0,g = 0,b = 0;
@@ -328,10 +328,15 @@ public class ImageHandler {
 						(int)(Math.sin(Math.PI*(itrArray[i][j] - minItr)/(peakPointRed*2.0*(maxItr-minItr)))*255) 
 						:(int)(Math.sin(Math.PI*((itrArray[i][j] - minItr+(2*peakPointRed-1)*(minItr-maxItr)))/((1.0-peakPointRed)*2.0*(maxItr-minItr)))*255) ;
 				
-				g = (itrArray[i][j] < peakPointGreen*maxItr) ? 
-						(int)(Math.sin(Math.PI*(itrArray[i][j] - minGreen)/(peakPointGreen*2.0*(maxItr-minGreen)))*255) 
-						:(int)(Math.sin(Math.PI*((itrArray[i][j] - minGreen+(2*peakPointGreen-1)*(minGreen-maxItr)))/((1.0-peakPointGreen)*2.0*(maxItr-minGreen)))*255) ;
+//				g = (itrArray[i][j] < peakPointGreen*maxItr) ? 
+//						(int)(Math.sin(Math.PI*(itrArray[i][j] - minGreen)/(peakPointGreen*2.0*(maxItr-minGreen)))*255) 
+//						:(int)(Math.sin(Math.PI*((itrArray[i][j] - minGreen+(2*peakPointGreen-1)*(minGreen-maxItr)))/((1.0-peakPointGreen)*2.0*(maxItr-minGreen)))*255) ;
+				
 				g = (itrArray[i][j] < minGreen) ? 0 : g;
+				
+				//test
+				g = (int)(1.0/Math.pow(255, 4) * Math.pow(r, 5));
+				
 				if (r < 0 || g < 0 || b < 0){
 					r = Math.abs(r);
 					g = Math.abs(g);
@@ -382,6 +387,7 @@ public class ImageHandler {
 		int r,g,b;
 		
 		int itr = 0;
+		boolean begining;
 		
 		for (int i = 0; i < imageHeight; i++){
 			for (int j = 0; j < imageWidth; j++){
@@ -391,6 +397,8 @@ public class ImageHandler {
 				g = 0;
 				b = 0;
 				
+				begining = true;
+				
 				if (itr <= 40){
 					r = (int)(Math.sin(Math.PI*itr/80)*255);
 				}else if (itr <= 100){
@@ -399,13 +407,14 @@ public class ImageHandler {
 				
 				while (itr > 900){
 					itr -= 900;
+					begining = false;
 				}
 			
 				if (itr <= 100){
 					g = (int)(((double)255/(double)100) * itr);
 				}else if (itr <= 200){
 					g = 255;
-					r = 255 - (int)(((double)255/(double)100) * (itr-100));
+					r = (begining) ? 255 - (int)(((double)255/(double)100) * (itr-100)) : 0;
 				}else if (itr <= 300){
 					b = (int)(((double)255/(double)100) * (itr-200));
 					g = 255 - (int)(((double)255/(double)100) * (itr-200));

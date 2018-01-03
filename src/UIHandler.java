@@ -3,11 +3,13 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.LayoutManager;
 import java.awt.MouseInfo;
 import java.awt.Paint;
 import java.awt.PaintContext;
+import java.awt.Panel;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -28,6 +30,7 @@ import java.text.Format;
 import java.text.NumberFormat;
 
 import javax.swing.*;
+import javax.swing.GroupLayout.Alignment;
 
 public class UIHandler implements MouseListener, ActionListener, ItemListener{
 	
@@ -70,6 +73,7 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener{
 	private JButton zoomOutBtn;
 	private JButton renderBtn;
 	private JButton stopBtn;
+	private JButton gotoBtn;
 	
 	private ComplexDouble newMiddle;
 	private ComplexBigDecimal newMiddleBD;
@@ -332,12 +336,20 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener{
 		panelGoto.setAlignmentX(0);
 		JPanel panelGotoLeft = new JPanel();
 		panelGotoLeft.setLayout(new BoxLayout(panelGotoLeft, BoxLayout.Y_AXIS));
+		panelGotoLeft.setAlignmentY(0);
 		JPanel panelGotoRight = new JPanel();
 		panelGotoRight.setLayout(new BoxLayout(panelGotoRight, BoxLayout.Y_AXIS));
-		
+		panelGotoRight.setAlignmentY(0);
+			
 		JLabel gotoZoom = new JLabel("Zoom ");
 		JLabel gotoReal = new JLabel("Real part ");
 		JLabel gotoImag = new JLabel("Imaginary part ");
+		
+		Font gotoFont = new Font(gotoZoom.getFont().getFontName(), Font.PLAIN, 14);
+		
+		gotoZoom.setFont(gotoFont);
+		gotoReal.setFont(gotoFont);
+		gotoImag.setFont(gotoFont);
 		
 		panelGotoLeft.add(gotoZoom);
 		panelGotoLeft.add(gotoReal);
@@ -353,6 +365,11 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener{
 		gotoImagField.setMaximumSize(new Dimension(RIGHT_PANEL_WIDTH, 20));
 		panelGotoRight.add(gotoImagField);
 		
+		gotoBtn = new JButton("GoTo");
+		gotoBtn.setActionCommand("GoTo");
+		gotoBtn.addActionListener(this);
+		panelGotoRight.add(gotoBtn);
+		
 		panelGoto.add(panelGotoLeft);
 		panelGoto.add(panelGotoRight);
 		panelRight.add(panelGoto);
@@ -362,6 +379,7 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener{
 		JPanel panelRenderStop = new JPanel();
 		panelRenderStop.setLayout(new BoxLayout(panelRenderStop, BoxLayout.X_AXIS));
 		panelRenderStop.setAlignmentX(0);
+		panelRenderStop.setAlignmentY(Panel.BOTTOM_ALIGNMENT);
 		
 		renderBtn = new JButton("Render");
 		renderBtn.setActionCommand("render");
