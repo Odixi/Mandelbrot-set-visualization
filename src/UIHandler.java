@@ -130,7 +130,7 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener{
 		zoomText = new JLabel("Zoom: " + String.valueOf(imageHandler.getZoom())); // TODO BD
 		panelLeft.add(zoomText);
 		
-		// ---- Koordinate fiels ----
+		// ---- Koordinate fiedls ----
 		JPanel koordPanel = new JPanel();
 		koordPanel.setLayout(new BoxLayout(koordPanel, BoxLayout.X_AXIS));
 		
@@ -142,11 +142,13 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener{
 		JPanel koordInputPanel = new JPanel();
 		koordInputPanel.setLayout(new BoxLayout(koordInputPanel, BoxLayout.Y_AXIS));
 		textFieldReal = new JTextField();
-		textFieldReal.setMaximumSize(new Dimension(90000, 20));
+		textFieldReal.setMaximumSize(new Dimension(9000, 20));
 		textFieldReal.setEditable(false);
 		textFieldImaginary = new JTextField();
-		textFieldImaginary.setMaximumSize(new Dimension(90000, 20));
+		textFieldImaginary.setMaximumSize(new Dimension(9000, 20));
 		textFieldImaginary.setEditable(false);
+		textFieldReal.setText("0");
+		textFieldImaginary.setText("0");
 		koordInputPanel.add(textFieldReal);
 		koordInputPanel.add(textFieldImaginary);
 		
@@ -196,6 +198,7 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener{
 		setResolutionBtn = new JButton("Set resolution");
 		setResolutionBtn.addActionListener(this);
 		setResolutionBtn.setActionCommand("resolution");
+		setResolutionBtn.setAlignmentX(0);
 		panelRight.add(setResolutionBtn);
 		
 		JComponent emptyBoxHor5 = (JComponent)Box.createRigidArea(new Dimension(RIGHT_PANEL_WIDTH, 10));
@@ -240,9 +243,6 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener{
 		panelRight.add(emptyBoxHor);
 		
 		// --- Zoom panel --- ///
-		
-		JPanel panelZoom = new JPanel();
-		panelZoom.setLayout(new BoxLayout(panelZoom, BoxLayout.Y_AXIS));
 		
 		panelZoomBtns = new JPanel();
 		panelZoomBtns.setLayout(new BoxLayout(panelZoomBtns, BoxLayout.X_AXIS));
@@ -331,55 +331,65 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener{
 		// ----- GoTo panel
 		
 		JPanel panelGoto = new JPanel();
-		panelGoto.setLayout(new BoxLayout(panelGoto, BoxLayout.X_AXIS));
+		panelGoto.setLayout(new BoxLayout(panelGoto, BoxLayout.Y_AXIS));
 		panelGoto.setBorder(BorderFactory.createEtchedBorder());
 		panelGoto.setAlignmentX(0);
-		JPanel panelGotoLeft = new JPanel();
-		panelGotoLeft.setLayout(new BoxLayout(panelGotoLeft, BoxLayout.Y_AXIS));
-		panelGotoLeft.setAlignmentY(0);
-		JPanel panelGotoRight = new JPanel();
-		panelGotoRight.setLayout(new BoxLayout(panelGotoRight, BoxLayout.Y_AXIS));
-		panelGotoRight.setAlignmentY(0);
+		JPanel panelGotoTitle = new JPanel();
+		panelGotoTitle.setLayout(new BoxLayout(panelGotoTitle, BoxLayout.X_AXIS));
+		panelGotoTitle.setAlignmentX(0);
+		JLabel gotoTitle = new JLabel("Go to a specific zoom and point");
+		panelGoto.add(gotoTitle);
+		JPanel panelGoto1 = new JPanel();
+		panelGoto1.setLayout(new BoxLayout(panelGoto1, BoxLayout.X_AXIS));
+		panelGoto1.setAlignmentX(0);
+		JPanel panelGoto2 = new JPanel();
+		panelGoto2.setLayout(new BoxLayout(panelGoto2, BoxLayout.X_AXIS));
+		panelGoto2.setAlignmentX(0);
+		JPanel panelGoto3 = new JPanel();
+		panelGoto3.setLayout(new BoxLayout(panelGoto3, BoxLayout.X_AXIS));
+		panelGoto3.setAlignmentX(0);
 			
-		JLabel gotoZoom = new JLabel("Zoom ");
-		JLabel gotoReal = new JLabel("Real part ");
+		JLabel gotoZoom = new JLabel("Zoom                 ");
+		JLabel gotoReal = new JLabel("Real part           ");
 		JLabel gotoImag = new JLabel("Imaginary part ");
 		
-		Font gotoFont = new Font(gotoZoom.getFont().getFontName(), Font.PLAIN, 14);
-		
-		gotoZoom.setFont(gotoFont);
-		gotoReal.setFont(gotoFont);
-		gotoImag.setFont(gotoFont);
-		
-		panelGotoLeft.add(gotoZoom);
-		panelGotoLeft.add(gotoReal);
-		panelGotoLeft.add(gotoImag);
+		panelGoto1.add(gotoZoom);
+		panelGoto2.add(gotoReal);
+		panelGoto3.add(gotoImag);
 		
 		gotoZoomField = new JTextField();
 		gotoZoomField.setMaximumSize(new Dimension(RIGHT_PANEL_WIDTH, 20));
-		panelGotoRight.add(gotoZoomField);
+		gotoZoomField.setText("5.0E-1");
+		panelGoto1.add(gotoZoomField);
 		gotoRealField = new JTextField();
 		gotoRealField.setMaximumSize(new Dimension(RIGHT_PANEL_WIDTH, 20));
-		panelGotoRight.add(gotoRealField);
+		gotoRealField.setText("0");
+		panelGoto2.add(gotoRealField);
 		gotoImagField = new JTextField();
 		gotoImagField.setMaximumSize(new Dimension(RIGHT_PANEL_WIDTH, 20));
-		panelGotoRight.add(gotoImagField);
+		gotoImagField.setText("0");
+		panelGoto3.add(gotoImagField);
 		
 		gotoBtn = new JButton("GoTo");
 		gotoBtn.setActionCommand("GoTo");
 		gotoBtn.addActionListener(this);
-		panelGotoRight.add(gotoBtn);
 		
-		panelGoto.add(panelGotoLeft);
-		panelGoto.add(panelGotoRight);
+		panelGoto.add(panelGotoTitle);
+		panelGoto.add(panelGoto1);
+		panelGoto.add(panelGoto2);
+		panelGoto.add(panelGoto3);
+		panelGoto.add(gotoBtn);
 		panelRight.add(panelGoto);
+		
+		JComponent emptyBoxHorGoto = (JComponent)Box.createRigidArea(new Dimension(RIGHT_PANEL_WIDTH, 20));
+		emptyBoxHorGoto.setAlignmentX(0);
+		panelRight.add(emptyBoxHorGoto);
 		
 		// ----- Render & Stop buttons ---- //
 		
 		JPanel panelRenderStop = new JPanel();
 		panelRenderStop.setLayout(new BoxLayout(panelRenderStop, BoxLayout.X_AXIS));
 		panelRenderStop.setAlignmentX(0);
-		panelRenderStop.setAlignmentY(Panel.BOTTOM_ALIGNMENT);
 		
 		renderBtn = new JButton("Render");
 		renderBtn.setActionCommand("render");
@@ -395,6 +405,10 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener{
 		stopBtn.setEnabled(false);
 		
 		panelRight.add(panelRenderStop);
+		
+		for (Component jc : panelRight.getComponents()){
+			((JComponent)jc).setAlignmentX(0);
+		}
 		
 		// <-<-->-> //
 		frame.setVisible(true);
@@ -627,6 +641,72 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener{
 			
 		case "render":
 			updateImage();
+			break;
+			
+		case "GoTo":
+			String zoom, real, imag;
+			
+			zoom = gotoZoomField.getText();
+			real = gotoRealField.getText();
+			imag = gotoImagField.getText();
+			
+			if (useBigDecimal){
+				BigDecimal zoomBD,realBD,imagBD;
+				try{
+					zoomBD = new BigDecimal(zoom);
+				}catch (Exception exc){
+					gotoZoomField.setText("Not valid format!");
+					return;
+				}
+				try{
+					realBD = new BigDecimal(real);
+				}catch (Exception exc){
+					gotoRealField.setText("Not valid format!");
+					return;
+				}
+				try{
+					imagBD = new BigDecimal(imag);
+				}catch (Exception exc){
+					gotoImagField.setText("Not valid format!");
+					return;
+				}
+				newZoomBD = zoomBD;
+				newZoom = zoomBD.doubleValue();
+				
+				newMiddleBD = new ComplexBigDecimal(realBD, imagBD);
+				newMiddle = new ComplexDouble(realBD.doubleValue(), imagBD.doubleValue());
+				textFieldReal.setText(String.valueOf(newMiddleBD.rp));
+				textFieldImaginary.setText(String.valueOf(newMiddleBD.ip));
+				zoomText.setText("Zoom: " + newZoom);
+			}else{
+				double zoomD,realD,imagD;
+				try{
+					zoomD = Double.valueOf(zoom);
+				}catch (Exception exc){
+					gotoZoomField.setText("Not valid format!");
+					return;
+				}
+				try{
+					realD = Double.valueOf(real);
+				}catch (Exception exc){
+					gotoRealField.setText("Not valid format!");
+					return;
+				}
+				try{
+					imagD = Double.valueOf(imag);
+				}catch (Exception exc){
+					gotoImagField.setText("Not valid format!");
+					return;
+				}
+				newZoom = zoomD;
+				newZoomBD = new BigDecimal(zoomD);
+				
+				newMiddle = new ComplexDouble(realD, imagD);
+				newMiddleBD = new ComplexBigDecimal(new BigDecimal(realD), new BigDecimal(imag));
+				textFieldReal.setText(String.valueOf(newMiddle.rp));
+				textFieldImaginary.setText(String.valueOf(newMiddle.ip));
+				zoomText.setText("Zoom: " + newZoom);
+			}
 			break;
 			
 		case "stop":
