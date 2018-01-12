@@ -492,6 +492,7 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener{
 			getIterLevel();
 		}catch (Exception e){
 			iterationsTextField.setText("Invalid input! Input has to be int > 0");
+			JOptionPane.showMessageDialog(null, "Invalid iterations input!");
 			return;
 		}
 		
@@ -518,6 +519,9 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener{
 		setResolutionBtn.setEnabled(false);
 		gotoBtn.setEnabled(false);
 		
+		saveImgBtn.setEnabled(false);
+		browseDirBtn.setEnabled(false);
+		
 	}
 	
 	private void enableStuff(){
@@ -533,6 +537,9 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener{
 		stopBtn.setEnabled(false);
 		setResolutionBtn.setEnabled(true);
 		gotoBtn.setEnabled(true);
+
+		saveImgBtn.setEnabled(true);
+		browseDirBtn.setEnabled(true);
 	}
 	
 	public void reciveImage(BufferedImage img){
@@ -653,28 +660,16 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener{
 	}
 
 	@Override
-	public void mousePressed(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void mousePressed(MouseEvent e) {}
 
 	@Override
-	public void mouseReleased(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void mouseReleased(MouseEvent e) {}
 
 	@Override
-	public void mouseEntered(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void mouseEntered(MouseEvent e) {}
 
 	@Override
-	public void mouseExited(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void mouseExited(MouseEvent e) {}
 
 	//Button actions
 	@Override
@@ -699,8 +694,16 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener{
 		switch (action) {
 		case "save":
 			File dir = fileChooser.getSelectedFile();
+			File file = new File(dir, imageFileNameTextField.getText() + ".png");
 			try {
-				ImageIO.write(image, "PNG", new File(dir, imageFileNameTextField.getText() + ".png"));
+				if (file.exists()){
+					int ans = JOptionPane.showConfirmDialog(null, "The file " + file.getName() + " alredy exist. Do you want to overwrite?" ,
+							"Overwrite?", JOptionPane.YES_NO_OPTION);
+					if (ans != JOptionPane.YES_OPTION){
+						return;
+					}
+				}
+				ImageIO.write(image, "PNG", file);
 				JOptionPane.showMessageDialog(null, "Image saved succesfully");
 			} catch (Exception e1) {
 				JOptionPane.showMessageDialog(null, "Error");
@@ -749,18 +752,21 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener{
 					zoomBD = new BigDecimal(zoom);
 				}catch (Exception exc){
 					gotoZoomField.setText("Not valid format!");
+					JOptionPane.showMessageDialog(null, "Invalid format");
 					return;
 				}
 				try{
 					realBD = new BigDecimal(real);
 				}catch (Exception exc){
 					gotoRealField.setText("Not valid format!");
+					JOptionPane.showMessageDialog(null, "Invalid format");
 					return;
 				}
 				try{
 					imagBD = new BigDecimal(imag);
 				}catch (Exception exc){
 					gotoImagField.setText("Not valid format!");
+					JOptionPane.showMessageDialog(null, "Invalid format");
 					return;
 				}
 				newZoomBD = zoomBD;
@@ -777,18 +783,21 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener{
 					zoomD = Double.valueOf(zoom);
 				}catch (Exception exc){
 					gotoZoomField.setText("Not valid format!");
+					JOptionPane.showMessageDialog(null, "Invalid format");
 					return;
 				}
 				try{
 					realD = Double.valueOf(real);
 				}catch (Exception exc){
 					gotoRealField.setText("Not valid format!");
+					JOptionPane.showMessageDialog(null, "Invalid format");
 					return;
 				}
 				try{
 					imagD = Double.valueOf(imag);
 				}catch (Exception exc){
 					gotoImagField.setText("Not valid format!");
+					JOptionPane.showMessageDialog(null, "Invalid format");
 					return;
 				}
 				newZoom = zoomD;
