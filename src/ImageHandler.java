@@ -60,6 +60,9 @@ public class ImageHandler {
 		}else{
 			stepXbd = new BigDecimal(xmax-xmin).divide(zoomBD,zoomBD.precision()+START_SCALE,BigDecimal.ROUND_HALF_UP).divide(new BigDecimal(imageWidth),zoomBD.precision()+START_SCALE,BigDecimal.ROUND_HALF_UP).setScale(zoomBD.precision()+START_SCALE,BigDecimal.ROUND_DOWN);
 			stepYbd = new BigDecimal(ymax-ymin).divide(zoomBD,zoomBD.precision()+START_SCALE,BigDecimal.ROUND_HALF_UP).divide(new BigDecimal(imageHeight),zoomBD.precision()+START_SCALE,BigDecimal.ROUND_HALF_UP).setScale(zoomBD.precision()+START_SCALE,BigDecimal.ROUND_DOWN);
+			System.out.println("stepX " + stepXbd);
+			System.out.println("log(stepX) " + Math.log10(stepXbd.doubleValue()));
+			System.out.println("log (zoom) " + Math.log10(zoom) );
 		}
 		
 		int[][] itrationArray = new int[imageHeight][imageWidth];
@@ -486,7 +489,7 @@ public class ImageHandler {
 		}
 		return new Color(brightValue,brightValue,brightValue);
 	}
-	
+	@Deprecated
 	private Color calculateColorValueSYC(ComplexDouble c){
 		
 		int iterAdLvl = 100;
@@ -548,7 +551,7 @@ public class ImageHandler {
 		
 		return new Color(r,g,b);
 	}
-	
+	@Deprecated
 	private Color calculateColorValueSYC(ComplexBigDecimal c){
 		
 		int iterAdLvl = 100;
@@ -620,13 +623,13 @@ public class ImageHandler {
 	
 	public ComplexBigDecimal TransformCoordinateToComplexBD(int x, int y){
 		
-		BigDecimal stepX = new BigDecimal(xmax-xmin).divide(zoomBD,zoomBD.precision()+START_SCALE+16,BigDecimal.ROUND_HALF_UP).divide(new BigDecimal(imageWidth),zoomBD.precision()+START_SCALE+16,BigDecimal.ROUND_HALF_UP).setScale(zoomBD.precision()+START_SCALE+16,BigDecimal.ROUND_DOWN);
-		BigDecimal stepY = new BigDecimal(ymax-ymin).divide(zoomBD,zoomBD.precision()+START_SCALE+16,BigDecimal.ROUND_HALF_UP).divide(new BigDecimal(imageHeight),zoomBD.precision()+START_SCALE+16,BigDecimal.ROUND_HALF_UP).setScale(zoomBD.precision()+START_SCALE+16,BigDecimal.ROUND_DOWN);
+		BigDecimal stepX = new BigDecimal(xmax-xmin).divide(zoomBD,zoomBD.precision()+START_SCALE,BigDecimal.ROUND_HALF_UP).divide(new BigDecimal(imageWidth),zoomBD.precision()+START_SCALE,BigDecimal.ROUND_HALF_UP).setScale(zoomBD.precision()+START_SCALE,BigDecimal.ROUND_DOWN);
+		BigDecimal stepY = new BigDecimal(ymax-ymin).divide(zoomBD,zoomBD.precision()+START_SCALE,BigDecimal.ROUND_HALF_UP).divide(new BigDecimal(imageHeight),zoomBD.precision()+START_SCALE,BigDecimal.ROUND_HALF_UP).setScale(zoomBD.precision()+START_SCALE,BigDecimal.ROUND_DOWN);
 
 		
 		return new ComplexBigDecimal(
-				(new BigDecimal(xmin).divide(zoomBD,zoomBD.precision()+START_SCALE+16,BigDecimal.ROUND_HALF_UP)).add(new BigDecimal(x).multiply(stepX)).setScale(zoomBD.precision()+START_SCALE+16,BigDecimal.ROUND_DOWN),
-				(new BigDecimal(ymin).divide(zoomBD,zoomBD.precision()+START_SCALE+16,BigDecimal.ROUND_HALF_UP)).add(new BigDecimal(y).multiply(stepY)).setScale(zoomBD.precision()+START_SCALE+16,BigDecimal.ROUND_DOWN))
+				(new BigDecimal(xmin).divide(zoomBD,zoomBD.precision()+START_SCALE,BigDecimal.ROUND_HALF_UP)).add(new BigDecimal(x).multiply(stepX)).setScale(zoomBD.precision()+START_SCALE,BigDecimal.ROUND_DOWN),
+				(new BigDecimal(ymin).divide(zoomBD,zoomBD.precision()+START_SCALE,BigDecimal.ROUND_HALF_UP)).add(new BigDecimal(y).multiply(stepY)).setScale(zoomBD.precision()+START_SCALE,BigDecimal.ROUND_DOWN))
 				.add(middleBD);
 	}
 	

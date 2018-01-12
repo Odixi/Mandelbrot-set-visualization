@@ -4,6 +4,8 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.LayoutManager;
 import java.awt.MouseInfo;
@@ -24,11 +26,14 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.attribute.UserPrincipalLookupService;
 import java.text.Format;
 import java.text.NumberFormat;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 
@@ -42,6 +47,8 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener{
 	private final int MIN_HEIGHT = 600;
 	private final int MIN_WIDHT = 700;
 	private final int HEIGHT_ADDITIONAL = 130;
+	
+	private BufferedImage image;
 	
 	private ImageHandler imageHandler;
 	private ImageCalcThread imageCalcThread;
@@ -74,6 +81,12 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener{
 	private JButton renderBtn;
 	private JButton stopBtn;
 	private JButton gotoBtn;
+	
+	private JFileChooser fileChooser;
+	private JTextField chooseDirTextField;
+	private JTextField imageFileNameTextField;
+	private JButton browseDirBtn;
+	private JButton saveImgBtn;
 	
 	private ComplexDouble newMiddle;
 	private ComplexBigDecimal newMiddleBD;
@@ -406,6 +419,62 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener{
 		
 		panelRight.add(panelRenderStop);
 		
+		JComponent emptyBoxHorrs = (JComponent)Box.createRigidArea(new Dimension(RIGHT_PANEL_WIDTH, 20));
+		emptyBoxHorrs.setAlignmentX(0);
+		panelRight.add(emptyBoxHorrs);
+		
+		// ------- Save Image Panel ------- //
+		
+		JPanel savePanel = new JPanel();
+		savePanel.setLayout(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
+		savePanel.setAlignmentX(0);
+		savePanel.setBorder(BorderFactory.createEtchedBorder());
+		
+		JLabel saveLabText = new JLabel("Save image:");
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.anchor = GridBagConstraints.FIRST_LINE_START;
+		c.gridx = 0; c.gridy = 0;
+		savePanel.add(saveLabText, c);
+		
+		c.gridx = 0; c.gridy = 1; c.weightx = 0.01;
+		savePanel.add(new JLabel("File name: "),c);
+		
+		c.gridx = 1; c.gridy = 1; c.weightx = 0.99;
+		imageFileNameTextField = new JTextField("img");
+		savePanel.add(imageFileNameTextField,c);
+		
+		c.gridx = 0; c.gridy = 2; c.weightx = 0.01;
+		savePanel.add(new JLabel("Directory: "),c);
+		
+		c.gridx = 1; c.gridy = 2; c.weightx = 0.9;
+		chooseDirTextField = new JTextField(new File(".").getAbsolutePath());
+		savePanel.add(chooseDirTextField,c);
+		
+		c.gridx = 0; c.gridy = 3; c.weightx = 0.5; c.gridwidth = 2;
+		JPanel sspan = new JPanel();
+		sspan.setLayout(new BoxLayout(sspan, BoxLayout.X_AXIS));
+		savePanel.add(sspan, c);
+		browseDirBtn = new JButton("Browse dir");
+		browseDirBtn.setActionCommand("browse");
+		browseDirBtn.addActionListener(this);
+		sspan.add(browseDirBtn);
+		
+		sspan.add((JComponent)Box.createRigidArea(new Dimension(10, 0)));
+
+		saveImgBtn = new JButton("Save image");
+		saveImgBtn.setActionCommand("save");
+		saveImgBtn.addActionListener(this);
+		sspan.add(saveImgBtn);
+		
+		fileChooser = new JFileChooser();
+		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		fileChooser.setApproveButtonText("Select directory");
+		fileChooser.setCurrentDirectory(new File("."));
+		
+		savePanel.setMaximumSize(new Dimension(RIGHT_PANEL_WIDTH, 100));
+		panelRight.add(savePanel);
+		
 		for (Component jc : panelRight.getComponents()){
 			((JComponent)jc).setAlignmentX(0);
 		}
@@ -417,7 +486,7 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener{
 		
 	}
 	
-	private void updateImage(){ //TODO Uuteen threadiin!
+	private void updateImage(){
 		
 		try{
 			getIterLevel();
@@ -447,6 +516,7 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener{
 		renderBtn.setEnabled(false);
 		stopBtn.setEnabled(true);
 		setResolutionBtn.setEnabled(false);
+		gotoBtn.setEnabled(false);
 		
 	}
 	
@@ -462,9 +532,11 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener{
 		renderBtn.setEnabled(true);
 		stopBtn.setEnabled(false);
 		setResolutionBtn.setEnabled(true);
+		gotoBtn.setEnabled(true);
 	}
 	
 	public void reciveImage(BufferedImage img){
+		image = img;
 		imgLabel.setIcon(new ImageIcon(img));
 		zoomText.setText("Zoom: " + String.valueOf(imageHandler.getZoom()));
 		imageCalcThread = new ImageCalcThread(imageHandler, this);
@@ -615,14 +687,35 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener{
 			zoomStep = parseZoomFieldValue();
 		} catch(Exception a){
 			zoomStepField.setText("Ivalid format!");
+			JOptionPane.showMessageDialog(null, "Invalid format");
 			return;
 		}
 		if (zoomStep == 0){
 			zoomStepField.setText("0 is not allowed!");
+			JOptionPane.showMessageDialog(null, "0 is not allowed!");
 			return;
 		}
 		
 		switch (action) {
+		case "save":
+			File dir = fileChooser.getSelectedFile();
+			try {
+				ImageIO.write(image, "PNG", new File(dir, imageFileNameTextField.getText() + ".png"));
+				JOptionPane.showMessageDialog(null, "Image saved succesfully");
+			} catch (Exception e1) {
+				JOptionPane.showMessageDialog(null, "Error");
+				e1.printStackTrace();	
+				return;
+			}
+			break;
+		
+		case "browse":
+			int returnVal = fileChooser.showOpenDialog(null);
+			if (returnVal == JFileChooser.APPROVE_OPTION){
+				chooseDirTextField.setText(fileChooser.getSelectedFile().getAbsolutePath());
+			}
+			break;
+			
 		case "resolution":
 			setResolution();
 			break;
