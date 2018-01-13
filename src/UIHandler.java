@@ -36,15 +36,17 @@ import java.text.NumberFormat;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
-public class UIHandler implements MouseListener, ActionListener, ItemListener{
+public class UIHandler implements MouseListener, ActionListener, ItemListener, DocumentListener{
 	
 	public static final int BLACK_WHITE = 0;
 	public static final int COLORFUL = 1;
 	public static final int CONSTANT_COLORING = 2;
 	
 	private final int RIGHT_PANEL_WIDTH = 256;
-	private final int MIN_HEIGHT = 600;
+	private final int MIN_HEIGHT = 760;
 	private final int MIN_WIDHT = 700;
 	private final int HEIGHT_ADDITIONAL = 130;
 	
@@ -88,6 +90,19 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener{
 	private JButton browseDirBtn;
 	private JButton saveImgBtn;
 	
+	private boolean sequenceOn;
+	private int imgNumber;
+	
+	private JTextField imgseqZoomStart;
+	private JTextField imgseqZoomEnd;
+	private JTextField imgseqZoomStep;
+	private JTextField imgseqDirTF;
+	private JTextField imgseqNameTF;
+	private JButton imgseqStartBtn;
+	private JButton imgseqStopBtn;
+	private JButton imgseqBrowseBtn;
+	private JLabel imgseqImageAmountLabel;
+	
 	private ComplexDouble newMiddle;
 	private ComplexBigDecimal newMiddleBD;
 	private double newZoom;
@@ -109,7 +124,7 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener{
 		newMiddleBD = new ComplexBigDecimal(new BigDecimal(0), new BigDecimal(0));
 		frame = new JFrame("Mandelbrot set tools");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(imageHandler.getWidth() + RIGHT_PANEL_WIDTH + 34, imageHandler.getHeight() + HEIGHT_ADDITIONAL); //TODO
+		frame.setSize(imageHandler.getWidth() + RIGHT_PANEL_WIDTH + 50, imageHandler.getHeight() + HEIGHT_ADDITIONAL); //TODO
 		frame.setMaximumSize(new Dimension(5000, 5000));
 		frame.setResizable(true);
 		
@@ -173,11 +188,17 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener{
 		
 		// -------------------- Right side --------------------- //
 		
+		JTabbedPane rightTabPane = new JTabbedPane();
+		panelMain.add(rightTabPane);
+		rightTabPane.setAlignmentY(0);
+		
 		panelRight = new JPanel();
 		panelRight.setLayout(new BoxLayout(panelRight, BoxLayout.Y_AXIS));
 		panelRight.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
-		panelMain.add(panelRight);
+//		panelMain.add(panelRight);
 		panelRight.setAlignmentY(0);
+		
+		rightTabPane.addTab("General", panelRight);
 		
 		JComponent emptyBoxHor4 = (JComponent)Box.createRigidArea(new Dimension(RIGHT_PANEL_WIDTH, 10));
 		emptyBoxHor4.setAlignmentX(0);
@@ -192,6 +213,7 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener{
 		JPanel panelResolution = new JPanel();
 		panelResolution.setLayout(new BoxLayout(panelResolution, BoxLayout.X_AXIS));
 		panelResolution.setAlignmentX(0);
+		panelResolution.setMaximumSize(new Dimension(RIGHT_PANEL_WIDTH, 20));
 		
 		JLabel resXLabel = new JLabel("Width:");
 		panelResolution.add(resXLabel);
@@ -346,6 +368,7 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener{
 		JPanel panelGoto = new JPanel();
 		panelGoto.setLayout(new BoxLayout(panelGoto, BoxLayout.Y_AXIS));
 		panelGoto.setBorder(BorderFactory.createEtchedBorder());
+		panelGoto.setMaximumSize(new Dimension(RIGHT_PANEL_WIDTH, 112));
 		panelGoto.setAlignmentX(0);
 		JPanel panelGotoTitle = new JPanel();
 		panelGotoTitle.setLayout(new BoxLayout(panelGotoTitle, BoxLayout.X_AXIS));
@@ -479,6 +502,116 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener{
 			((JComponent)jc).setAlignmentX(0);
 		}
 		
+		// >>>>>>>>>>>>>>>>>>>>>>> Image sequence UI <<<<<<<<<<<<<<<<<<<<<<<<<<
+		
+		JPanel panelImageTab = new JPanel();
+		panelImageTab.setLayout(new BoxLayout(panelImageTab, BoxLayout.Y_AXIS));
+		
+		// ------ imgseq Zoom Panel -------
+		
+		JPanel imgseqZoomPanel = new JPanel();
+		imgseqZoomPanel.setBorder(BorderFactory.createEtchedBorder());
+		imgseqZoomPanel.setLayout(new GridBagLayout());
+		imgseqZoomPanel.setAlignmentY(0);
+		GridBagConstraints zoomC = new GridBagConstraints();
+		
+		zoomC.fill = GridBagConstraints.HORIZONTAL;
+		zoomC.anchor = GridBagConstraints.FIRST_LINE_START;
+		zoomC.weighty = 0;
+		zoomC.weightx = 0.1;
+		
+		zoomC.gridx = 0; zoomC.gridy = 0;
+		JLabel imgseqZoomStepLabel = new JLabel("Zoom step:");
+		imgseqZoomPanel.add(imgseqZoomStepLabel, zoomC);
+		
+		
+		zoomC.gridx = 0; zoomC.gridy = 1;
+		JLabel imgseqZoomStartLabel = new JLabel("Zoom start:");
+		imgseqZoomPanel.add(imgseqZoomStartLabel, zoomC);
+		
+		zoomC.gridx = 0; zoomC.gridy = 2;
+		JLabel imgseqZoomEndLabel = new JLabel("Zoom end:");
+		imgseqZoomPanel.add(imgseqZoomEndLabel, zoomC);
+		
+		zoomC.weightx = 0.9;
+		zoomC.gridx = 1; zoomC.gridy = 0;
+		imgseqZoomStep = new JTextField("1.1");
+		imgseqZoomPanel.add(imgseqZoomStep, zoomC);
+		imgseqZoomStep.getDocument().addDocumentListener(this);
+		
+		zoomC.gridx = 1; zoomC.gridy = 1;
+		imgseqZoomStart = new JTextField("0.5");
+		imgseqZoomPanel.add(imgseqZoomStart, zoomC);
+		imgseqZoomStart.getDocument().addDocumentListener(this);
+		
+		zoomC.gridx = 1; zoomC.gridy = 2; zoomC.weighty = 1;
+		imgseqZoomEnd = new JTextField("1.0E12");
+		imgseqZoomPanel.add(imgseqZoomEnd, zoomC);
+		imgseqZoomEnd.getDocument().addDocumentListener(this);
+		
+		panelImageTab.add(imgseqZoomPanel);
+		
+		imgseqImageAmountLabel = new JLabel("Number of images: " + (int)Math.ceil(MandelbrotTools.logb(1.0E12/0.5, 1.1)));
+		panelImageTab.add(imgseqImageAmountLabel);
+		imgseqImageAmountLabel.setAlignmentY(0);
+		
+		// ------- dir choos and start panel -------
+		
+		JPanel imgseqSavePanel = new JPanel();
+		imgseqSavePanel.setLayout(new GridBagLayout());
+		c = new GridBagConstraints();
+		imgseqSavePanel.setAlignmentY(0);
+		imgseqSavePanel.setBorder(BorderFactory.createEtchedBorder());
+
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.anchor = GridBagConstraints.FIRST_LINE_START;
+		c.gridx = 0; c.gridy = 0;
+		
+		c.gridx = 0; c.gridy = 1; c.weightx = 0.01;
+		imgseqSavePanel.add(new JLabel("File name: "),c);
+		
+		c.gridx = 1; c.gridy = 1; c.weightx = 0.99;
+		imgseqNameTF = new JTextField("img_");
+		imgseqSavePanel.add(imgseqNameTF, c);
+		
+		c.gridx = 0; c.gridy = 2; c.weightx = 0.01;
+		imgseqSavePanel.add(new JLabel("Directory: "),c);
+		
+		c.gridx = 1; c.gridy = 2; c.weightx = 0.9;
+		imgseqDirTF = new JTextField(new File(".").getAbsolutePath());
+		imgseqSavePanel.add(imgseqDirTF, c);
+		
+		c.gridx = 0; c.gridy = 3; c.weightx = 0.5; c.gridwidth = 2;
+		JPanel imgseqsspan = new JPanel();
+		imgseqsspan.setLayout(new BoxLayout(imgseqsspan, BoxLayout.X_AXIS));
+		imgseqSavePanel.add(imgseqsspan, c);
+		imgseqBrowseBtn = new JButton("Browse dir");
+		imgseqBrowseBtn.setActionCommand("browseImgSeq");
+		imgseqBrowseBtn.addActionListener(this);
+		imgseqsspan.add(imgseqBrowseBtn);
+		
+//		imgseqSavePanel.setMaximumSize(new Dimension(RIGHT_PANEL_WIDTH, 100));
+		panelImageTab.add(imgseqSavePanel);
+		
+		// -------- Start / Stop -------
+		
+		JPanel imgseqStartStopPanel = new JPanel();
+		imgseqStartStopPanel.setLayout(new BoxLayout(imgseqStartStopPanel, BoxLayout.X_AXIS));
+		
+		JButton imgseqStartBtn = new JButton("Start");
+		imgseqStartBtn.addActionListener(this);
+		imgseqStartBtn.setActionCommand("StartImgSeq");
+		
+		JButton imgseqStopBtn = new JButton("Stop"); //TODO
+		
+		imgseqStartStopPanel.add(imgseqStartBtn);
+		imgseqStartStopPanel.add(imgseqStopBtn);
+		
+		panelImageTab.add(imgseqStartStopPanel);
+			
+		rightTabPane.addTab("Image sequence", panelImageTab);
+		
+		
 		// <-<-->-> //
 		frame.setVisible(true);
 		imgLabel.addMouseListener(this);
@@ -547,9 +680,47 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener{
 		imgLabel.setIcon(new ImageIcon(img));
 		zoomText.setText("Zoom: " + String.valueOf(imageHandler.getZoom()));
 		imageCalcThread = new ImageCalcThread(imageHandler, this);
-		enableStuff();
+		
+		if (sequenceOn){
+			newZoom = newZoom * Double.valueOf(imgseqZoomStep.getText());
+			newZoomBD = BigDecimal.valueOf(newZoom);
+			sequenceOn = Double.valueOf(imgseqZoomEnd.getText()) > newZoom;
+			saveImage();
+			
+			double start = Double.valueOf(imgseqZoomStart.getText());
+			double end = Double.valueOf(imgseqZoomEnd.getText());
+			double step = Double.valueOf(imgseqZoomStep.getText());
+			imgseqImageAmountLabel.setText("Number of images: " + imgNumber + " / " +  (int)Math.ceil(MandelbrotTools.logb(end/start, step)));
+		}
+		if (sequenceOn){
+			updateImage();
+			imgNumber++;
+		}else {
+			enableStuff();
+		}
 	}
 	
+	/**
+	 * Used to save image sequence images
+	 */
+	private void saveImage() {
+		File dir = fileChooser.getSelectedFile();
+		double start = Double.valueOf(imgseqZoomStart.getText());
+		double end = Double.valueOf(imgseqZoomEnd.getText());
+		double step = Double.valueOf(imgseqZoomStep.getText());
+		int sigDigits = (int)Math.ceil(MandelbrotTools.logb(end/start, step));
+		sigDigits = String.valueOf(sigDigits).length();
+		File file = new File(dir, imgseqNameTF.getText() + String.format("%0" + sigDigits + "d", imgNumber) + ".png");
+		try {
+			ImageIO.write(image, "PNG", file);
+		} catch (Exception e1) {
+			JOptionPane.showMessageDialog(null, "Error");
+			e1.printStackTrace();	
+			return;
+		}
+		
+	}
+
 	public void setLoadingText(String state){
 		imgLabel.setText(state);
 		frame.setTitle(" Mandelbrot set tools " + state);
@@ -629,7 +800,7 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener{
 		imageHandler.setXYMinMax(xmin, xmax, ymin, ymax);
 		
 		imgLabel.setIcon(new ImageIcon(new BufferedImage(width, height, BufferedImage.TYPE_INT_BGR)));
-		int frameWidth = (width + RIGHT_PANEL_WIDTH + 34 < MIN_WIDHT) ? MIN_WIDHT : width + RIGHT_PANEL_WIDTH + 34;
+		int frameWidth = (width + RIGHT_PANEL_WIDTH + 50 < MIN_WIDHT) ? MIN_WIDHT : width + RIGHT_PANEL_WIDTH + 34;
 		int frameHeight = (height + HEIGHT_ADDITIONAL < MIN_HEIGHT) ? MIN_HEIGHT : height + HEIGHT_ADDITIONAL;
 		frame.setSize(frameWidth, frameHeight);
 		updateImage();
@@ -692,6 +863,10 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener{
 		}
 		
 		switch (action) {
+		case "StartImgSeq":
+			startImageSequenceRendering();
+			return;
+		
 		case "save":
 			File dir = fileChooser.getSelectedFile();
 			File file = new File(dir, imageFileNameTextField.getText() + ".png");
@@ -716,6 +891,13 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener{
 			int returnVal = fileChooser.showOpenDialog(null);
 			if (returnVal == JFileChooser.APPROVE_OPTION){
 				chooseDirTextField.setText(fileChooser.getSelectedFile().getAbsolutePath());
+			}
+			break;
+			
+		case "browseImgSeq":
+			int returnValImgSeq = fileChooser.showOpenDialog(null);
+			if (returnValImgSeq == JFileChooser.APPROVE_OPTION){
+				imgseqDirTF.setText(fileChooser.getSelectedFile().getAbsolutePath());
 			}
 			break;
 			
@@ -817,6 +999,21 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener{
 		
 	}
 
+	private void startImageSequenceRendering() {
+		
+		sequenceOn = true;
+		double zoomStep = Double.valueOf(imgseqZoomStep.getText());
+		double zoomStart = Double.valueOf(imgseqZoomStart.getText());
+		double zoomEnd = Double.valueOf(imgseqZoomEnd.getText());
+		
+		newZoom = zoomStart*zoomStep;
+//		newZoomBD = imageHandler.getZoomBD().multiply(new BigDecimal(zoomStep)); //TODO
+		newZoomBD = BigDecimal.valueOf(newZoom);
+		imgNumber = 1;
+		updateImage();
+		
+	}
+
 	// Check box listener
 	@Override
 	public void itemStateChanged(ItemEvent e) {
@@ -826,6 +1023,33 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener{
 		}else{
 			useBigDecimal = true;
 		}
+		
+	}
+
+	@Override
+	public void insertUpdate(DocumentEvent e) {
+		changedUpdate(e);
+	}
+
+	@Override
+	public void removeUpdate(DocumentEvent e) {
+		changedUpdate(e);
+	}
+
+	@Override
+	public void changedUpdate(DocumentEvent e) {
+		
+		double start,end,step;
+		try{
+			start = Double.valueOf(imgseqZoomStart.getText());
+			end = Double.valueOf(imgseqZoomEnd.getText());
+			step = Double.valueOf(imgseqZoomStep.getText());
+		} catch (Exception exc){
+			imgseqImageAmountLabel.setText("Number of images: -");
+			return;
+		}
+			
+		imgseqImageAmountLabel.setText("Number of images: " + (int)Math.ceil(MandelbrotTools.logb(end/start, step)));
 		
 	}
 

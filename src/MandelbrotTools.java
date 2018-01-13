@@ -33,5 +33,10 @@ public class MandelbrotTools {
 		return itr;
 	}
 	
+	// just for convienience
+	public static double logb(double a, double base){
+		return Math.log(a)/Math.log(base);
+	}
+	
 }	
 
