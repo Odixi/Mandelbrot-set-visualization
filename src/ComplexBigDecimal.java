@@ -18,13 +18,13 @@ public class ComplexBigDecimal{
 	}
 		
 	public ComplexBigDecimal square(){
-		return new ComplexBigDecimal((this.rp.multiply(this.rp)).subtract((this.ip.multiply(this.ip))).setScale(ImageHandler.zoomBD.precision()+ImageHandler.START_SCALE,BigDecimal.ROUND_HALF_UP), 
-				this.rp.multiply(this.ip).multiply(new BigDecimal(2)).setScale(ImageHandler.zoomBD.precision()+ImageHandler.START_SCALE,BigDecimal.ROUND_HALF_UP));
+		return new ComplexBigDecimal((this.rp.multiply(this.rp)).subtract((this.ip.multiply(this.ip))).setScale(ImageHandler.zoomBDScale+ImageHandler.START_SCALE,BigDecimal.ROUND_HALF_UP), 
+				this.rp.multiply(this.ip).multiply(new BigDecimal(2)).setScale(ImageHandler.zoomBDScale+ImageHandler.START_SCALE,BigDecimal.ROUND_HALF_UP));
 	}
 	
 	public BigDecimal absP2(){
 		
-		return this.rp.multiply(this.rp).add((this.ip.multiply(this.ip))).setScale(ImageHandler.zoomBD.precision()+ImageHandler.START_SCALE,BigDecimal.ROUND_HALF_UP);
+		return this.rp.multiply(this.rp).add((this.ip.multiply(this.ip))).setScale(ImageHandler.zoomBDScale+ImageHandler.START_SCALE,BigDecimal.ROUND_HALF_UP);
 
 	}
 	

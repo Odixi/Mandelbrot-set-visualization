@@ -598,11 +598,11 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener, D
 		JPanel imgseqStartStopPanel = new JPanel();
 		imgseqStartStopPanel.setLayout(new BoxLayout(imgseqStartStopPanel, BoxLayout.X_AXIS));
 		
-		JButton imgseqStartBtn = new JButton("Start");
+		imgseqStartBtn = new JButton("Start");
 		imgseqStartBtn.addActionListener(this);
 		imgseqStartBtn.setActionCommand("StartImgSeq");
 		
-		JButton imgseqStopBtn = new JButton("Stop"); //TODO
+		imgseqStopBtn = new JButton("Stop"); // TODO
 		
 		imgseqStartStopPanel.add(imgseqStartBtn);
 		imgseqStartStopPanel.add(imgseqStopBtn);
@@ -655,6 +655,13 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener, D
 		saveImgBtn.setEnabled(false);
 		browseDirBtn.setEnabled(false);
 		
+		imgseqBrowseBtn.setEnabled(false);
+		imgseqStartBtn.setEnabled(false);
+		imgseqStopBtn.setEnabled(true);
+		
+		imgseqZoomEnd.setEnabled(false);
+		imgseqZoomStart.setEnabled(false);
+		imgseqZoomStep.setEnabled(false);
 	}
 	
 	private void enableStuff(){
@@ -673,6 +680,14 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener, D
 
 		saveImgBtn.setEnabled(true);
 		browseDirBtn.setEnabled(true);
+		
+		imgseqBrowseBtn.setEnabled(true);
+		imgseqStartBtn.setEnabled(true);
+		imgseqStopBtn.setEnabled(false);
+		
+		imgseqZoomEnd.setEnabled(true);
+		imgseqZoomStart.setEnabled(true);
+		imgseqZoomStep.setEnabled(true);
 	}
 	
 	public void reciveImage(BufferedImage img){
@@ -682,9 +697,9 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener, D
 		imageCalcThread = new ImageCalcThread(imageHandler, this);
 		
 		if (sequenceOn){
+			sequenceOn = Double.valueOf(imgseqZoomEnd.getText()) > newZoom;
 			newZoom = newZoom * Double.valueOf(imgseqZoomStep.getText());
 			newZoomBD = BigDecimal.valueOf(newZoom);
-			sequenceOn = Double.valueOf(imgseqZoomEnd.getText()) > newZoom;
 			saveImage();
 			
 			double start = Double.valueOf(imgseqZoomStart.getText());
@@ -810,6 +825,10 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener, D
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		
+		if (sequenceOn){
+			return;
+		}
+		
 		Point p = MouseInfo.getPointerInfo().getLocation();
 		SwingUtilities.convertPointFromScreen(p, imgLabel);
 		p.x = p.x - ((int) (imgLabel.getSize().getWidth() - imgLabel.getIcon().getIconWidth()))/2;
@@ -826,6 +845,8 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener, D
 					textFieldReal.setText(String.valueOf(newMiddle.rp));
 					textFieldImaginary.setText(String.valueOf(newMiddle.ip));
 				}
+				System.out.println("BD: " + newMiddle.toString());
+				System.out.println("D: " + newMiddleBD.toString());
 		}
 
 	}
@@ -913,7 +934,7 @@ public class UIHandler implements MouseListener, ActionListener, ItemListener, D
 
 		case "zoomOut":
 			newZoom = imageHandler.getZoom()/zoomStep;
-			newZoomBD = imageHandler.getZoomBD().multiply(new BigDecimal(1.0/zoomStep));
+			newZoomBD = imageHandler.getZoomBD().multiply(new BigDecimal(1.0/zoomStep).setScale(ImageHandler.zoomBDScale, BigDecimal.ROUND_HALF_UP));
 			updateImage();
 			break;
 			

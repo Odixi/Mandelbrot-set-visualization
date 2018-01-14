@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit;
 
 public class ImageHandler {
 	
-	public static final int START_SCALE = 4;
+	public static final int START_SCALE = 6;
 	
 	private double xmax;
 	private double xmin;
@@ -17,6 +17,7 @@ public class ImageHandler {
 	
 	private double zoom;
 	public static BigDecimal zoomBD;
+	public static int zoomBDScale;
 	private ComplexDouble middle;
 	private ComplexBigDecimal middleBD;
 	
@@ -37,6 +38,7 @@ public class ImageHandler {
 		
 		this.zoom = zoom;
 		this.zoomBD = new BigDecimal(zoom);
+		this.zoomBDScale = zoomBD.toBigInteger().toString().length();
 		
 		middle = c;
 		middleBD = new ComplexBigDecimal(new BigDecimal(c.rp), new BigDecimal(c.ip));
@@ -58,11 +60,8 @@ public class ImageHandler {
 			stepX = (xmax-xmin)/zoom/(double)imageWidth;
 			stepY = (ymax-ymin)/zoom/(double)imageHeight;
 		}else{
-			stepXbd = new BigDecimal(xmax-xmin).divide(zoomBD,zoomBD.precision()+START_SCALE,BigDecimal.ROUND_HALF_UP).divide(new BigDecimal(imageWidth),zoomBD.precision()+START_SCALE,BigDecimal.ROUND_HALF_UP).setScale(zoomBD.precision()+START_SCALE,BigDecimal.ROUND_DOWN);
-			stepYbd = new BigDecimal(ymax-ymin).divide(zoomBD,zoomBD.precision()+START_SCALE,BigDecimal.ROUND_HALF_UP).divide(new BigDecimal(imageHeight),zoomBD.precision()+START_SCALE,BigDecimal.ROUND_HALF_UP).setScale(zoomBD.precision()+START_SCALE,BigDecimal.ROUND_DOWN);
-			System.out.println("stepX " + stepXbd);
-			System.out.println("log(stepX) " + Math.log10(stepXbd.doubleValue()));
-			System.out.println("log (zoom) " + Math.log10(zoom) );
+			stepXbd = new BigDecimal(xmax-xmin).divide(zoomBD,zoomBDScale+START_SCALE,BigDecimal.ROUND_HALF_UP).divide(new BigDecimal(imageWidth),zoomBDScale+START_SCALE,BigDecimal.ROUND_HALF_UP).setScale(zoomBDScale+START_SCALE,BigDecimal.ROUND_DOWN);
+			stepYbd = new BigDecimal(ymax-ymin).divide(zoomBD,zoomBDScale+START_SCALE,BigDecimal.ROUND_HALF_UP).divide(new BigDecimal(imageHeight),zoomBDScale+START_SCALE,BigDecimal.ROUND_HALF_UP).setScale(zoomBDScale+START_SCALE,BigDecimal.ROUND_DOWN);
 		}
 		
 		int[][] itrationArray = new int[imageHeight][imageWidth];
@@ -79,8 +78,8 @@ public class ImageHandler {
 		for (int i = 0; i < imageHeight; i++){
 			for (int j = phase; j < imageWidth; j = j + periodLength){
 				
-				c = (bigDecimal) ? new ComplexBigDecimal((new BigDecimal(xmin).divide(zoomBD,zoomBD.precision()+START_SCALE,BigDecimal.ROUND_HALF_UP)).add(new BigDecimal(j).multiply(stepXbd)).setScale(zoomBD.precision()+START_SCALE,BigDecimal.ROUND_DOWN),
-						(new BigDecimal(ymin).divide(zoomBD,zoomBD.precision()+START_SCALE,BigDecimal.ROUND_HALF_UP)).add(new BigDecimal(i).multiply(stepYbd)).setScale(zoomBD.precision()+START_SCALE,BigDecimal.ROUND_DOWN)) 
+				c = (bigDecimal) ? new ComplexBigDecimal((new BigDecimal(xmin).divide(zoomBD,zoomBDScale+START_SCALE,BigDecimal.ROUND_HALF_UP)).add(new BigDecimal(j).multiply(stepXbd)).setScale(zoomBDScale+START_SCALE,BigDecimal.ROUND_DOWN),
+						(new BigDecimal(ymin).divide(zoomBD,zoomBDScale+START_SCALE,BigDecimal.ROUND_HALF_UP)).add(new BigDecimal(i).multiply(stepYbd)).setScale(zoomBDScale+START_SCALE,BigDecimal.ROUND_DOWN)) 
 						: new ComplexDouble(xmin/zoom+j*stepX, ymin/zoom+i*stepY);
 				
 				int iterAdLevel = 100;
@@ -233,8 +232,8 @@ public class ImageHandler {
 	public BufferedImage calculateImageRGBwithBD(){
 		
 		BufferedImage img = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_RGB);
-		BigDecimal stepX = new BigDecimal(xmax-xmin).divide(zoomBD,zoomBD.precision()+START_SCALE,BigDecimal.ROUND_HALF_UP).divide(new BigDecimal(imageWidth),zoomBD.precision()+START_SCALE,BigDecimal.ROUND_HALF_UP).setScale(zoomBD.precision()+START_SCALE,BigDecimal.ROUND_DOWN);
-		BigDecimal stepY = new BigDecimal(ymax-ymin).divide(zoomBD,zoomBD.precision()+START_SCALE,BigDecimal.ROUND_HALF_UP).divide(new BigDecimal(imageHeight),zoomBD.precision()+START_SCALE,BigDecimal.ROUND_HALF_UP).setScale(zoomBD.precision()+START_SCALE,BigDecimal.ROUND_DOWN);
+		BigDecimal stepX = new BigDecimal(xmax-xmin).divide(zoomBD,zoomBDScale+START_SCALE,BigDecimal.ROUND_HALF_UP).divide(new BigDecimal(imageWidth),zoomBDScale+START_SCALE,BigDecimal.ROUND_HALF_UP).setScale(zoomBDScale+START_SCALE,BigDecimal.ROUND_DOWN);
+		BigDecimal stepY = new BigDecimal(ymax-ymin).divide(zoomBD,zoomBDScale+START_SCALE,BigDecimal.ROUND_HALF_UP).divide(new BigDecimal(imageHeight),zoomBDScale+START_SCALE,BigDecimal.ROUND_HALF_UP).setScale(zoomBDScale+START_SCALE,BigDecimal.ROUND_DOWN);
 		
 		itrArray = new int[imageHeight][imageWidth];
 		
@@ -248,8 +247,8 @@ public class ImageHandler {
 		
 		for (int i = 0; i < imageHeight; i++){
 			for (int j = 0; j < imageWidth; j++){
-				c = new ComplexBigDecimal((new BigDecimal(xmin).divide(zoomBD,zoomBD.precision()+START_SCALE,BigDecimal.ROUND_HALF_UP)).add(new BigDecimal(j).multiply(stepX)).setScale(zoomBD.precision()+START_SCALE,BigDecimal.ROUND_DOWN),
-											(new BigDecimal(ymin).divide(zoomBD,zoomBD.precision()+START_SCALE,BigDecimal.ROUND_HALF_UP)).add(new BigDecimal(i).multiply(stepY)).setScale(zoomBD.precision()+START_SCALE,BigDecimal.ROUND_DOWN));
+				c = new ComplexBigDecimal((new BigDecimal(xmin).divide(zoomBD,zoomBDScale+START_SCALE,BigDecimal.ROUND_HALF_UP)).add(new BigDecimal(j).multiply(stepX)).setScale(zoomBDScale+START_SCALE,BigDecimal.ROUND_DOWN),
+											(new BigDecimal(ymin).divide(zoomBD,zoomBDScale+START_SCALE,BigDecimal.ROUND_HALF_UP)).add(new BigDecimal(i).multiply(stepY)).setScale(zoomBDScale+START_SCALE,BigDecimal.ROUND_DOWN));
 				switch(colorMode){
 					case(UIHandler.COLORFUL):
 						img.setRGB(j, i, calculateColorValueSYC(c.add(middleBD)).getRGB());
@@ -618,18 +617,21 @@ public class ImageHandler {
 		double stepX = (double)(xmax-xmin)/zoom/(double)imageWidth;
 		double stepY = (double)(ymax-ymin)/zoom/(double)imageHeight;
 		
+		System.out.println("d: " +stepX);
+		
 		return new ComplexDouble((double)xmin/zoom+x*stepX, (double)ymin/zoom+y*stepY).add(middle);
 	}
 	
 	public ComplexBigDecimal TransformCoordinateToComplexBD(int x, int y){
 		
-		BigDecimal stepX = new BigDecimal(xmax-xmin).divide(zoomBD,zoomBD.precision()+START_SCALE,BigDecimal.ROUND_HALF_UP).divide(new BigDecimal(imageWidth),zoomBD.precision()+START_SCALE,BigDecimal.ROUND_HALF_UP).setScale(zoomBD.precision()+START_SCALE,BigDecimal.ROUND_DOWN);
-		BigDecimal stepY = new BigDecimal(ymax-ymin).divide(zoomBD,zoomBD.precision()+START_SCALE,BigDecimal.ROUND_HALF_UP).divide(new BigDecimal(imageHeight),zoomBD.precision()+START_SCALE,BigDecimal.ROUND_HALF_UP).setScale(zoomBD.precision()+START_SCALE,BigDecimal.ROUND_DOWN);
-
+		BigDecimal stepX = new BigDecimal(xmax-xmin).divide(zoomBD,zoomBDScale+START_SCALE,BigDecimal.ROUND_HALF_UP).divide(new BigDecimal(imageWidth),zoomBDScale+START_SCALE,BigDecimal.ROUND_HALF_UP).setScale(zoomBDScale+START_SCALE,BigDecimal.ROUND_DOWN);
+		BigDecimal stepY = new BigDecimal(ymax-ymin).divide(zoomBD,zoomBDScale+START_SCALE,BigDecimal.ROUND_HALF_UP).divide(new BigDecimal(imageHeight),zoomBDScale+START_SCALE,BigDecimal.ROUND_HALF_UP).setScale(zoomBDScale+START_SCALE,BigDecimal.ROUND_DOWN);
+		
+		System.out.println("bd: " +stepX);
 		
 		return new ComplexBigDecimal(
-				(new BigDecimal(xmin).divide(zoomBD,zoomBD.precision()+START_SCALE,BigDecimal.ROUND_HALF_UP)).add(new BigDecimal(x).multiply(stepX)).setScale(zoomBD.precision()+START_SCALE,BigDecimal.ROUND_DOWN),
-				(new BigDecimal(ymin).divide(zoomBD,zoomBD.precision()+START_SCALE,BigDecimal.ROUND_HALF_UP)).add(new BigDecimal(y).multiply(stepY)).setScale(zoomBD.precision()+START_SCALE,BigDecimal.ROUND_DOWN))
+				(new BigDecimal(xmin).divide(zoomBD,zoomBDScale+START_SCALE,BigDecimal.ROUND_HALF_UP)).add(new BigDecimal(x).multiply(stepX)).setScale(zoomBDScale+START_SCALE,BigDecimal.ROUND_DOWN),
+				(new BigDecimal(ymin).divide(zoomBD,zoomBDScale+START_SCALE,BigDecimal.ROUND_HALF_UP)).add(new BigDecimal(y).multiply(stepY)).setScale(zoomBDScale+START_SCALE,BigDecimal.ROUND_DOWN))
 				.add(middleBD);
 	}
 	
@@ -651,6 +653,7 @@ public class ImageHandler {
 	
 	public void setZoomBD(BigDecimal z){
 		zoomBD = z;
+		zoomBDScale = zoomBD.toBigInteger().toString().length();
 	}
 	
 	public double getZoom(){
@@ -659,6 +662,10 @@ public class ImageHandler {
 	
 	public BigDecimal getZoomBD(){
 		return zoomBD;
+	}
+	
+	public int getZoomBDScale(){
+		return zoomBDScale;
 	}
 	
 	public void setWidth(int w){
